@@ -5,12 +5,12 @@ import lucas.ifmg.produtos.entities.Category;
 import lucas.ifmg.produtos.repositories.CategoryRepository;
 import lucas.ifmg.produtos.services.exceptions.ResourceNotFound;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,9 +23,9 @@ public class CategoryService {
     private CategoryRepository categoryRepository;
 
     @Transactional(readOnly = true)
-    public List<CategoryDTO> findAll() {
-        List<Category> list = categoryRepository.findAll();
-        return list.stream().map(CategoryDTO::new).collect(Collectors.toList());
+    public Page<CategoryDTO> findAll(Pageable pageable) {
+        Page<Category> page = categoryRepository.findAll(pageable);
+        return page.map(CategoryDTO::new);
     }
 
     @Transactional(readOnly = true)
