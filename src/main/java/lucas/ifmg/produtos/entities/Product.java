@@ -1,6 +1,7 @@
 package lucas.ifmg.produtos.entities;
 
 import jakarta.persistence.*;
+
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;

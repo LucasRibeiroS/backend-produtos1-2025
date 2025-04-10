@@ -48,6 +48,7 @@ public class CategoryService {
         try {
             Category category = categoryRepository.getReferenceById(id);
             category.setName(categoryDTO.getName());
+            category = categoryRepository.save(category);
             return new CategoryDTO(category);
         } catch (EntityNotFoundException e) {
             throw new ResourceNotFound("Category not found");
