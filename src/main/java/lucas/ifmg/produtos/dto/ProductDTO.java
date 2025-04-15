@@ -17,12 +17,13 @@ public class ProductDTO {
     public ProductDTO() {
     }
 
-    public ProductDTO(Long id, String name, String description, Double price, String imageUrl) {
+    public ProductDTO(Long id, String name, String description, Double price, String imageUrl, Set<CategoryDTO> categories) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.imageUrl = imageUrl;
+        this.categories = categories;
     }
 
     public ProductDTO(Product entity) {
@@ -94,5 +95,11 @@ public class ProductDTO {
                 ", imageUrl='" + imageUrl + '\'' +
                 ", categories=" + categories +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        // TODO Auto-generated method stub
+        return super.equals(obj);
     }
 }

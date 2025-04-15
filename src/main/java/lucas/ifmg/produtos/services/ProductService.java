@@ -1,11 +1,13 @@
 package lucas.ifmg.produtos.services;
 
 import lucas.ifmg.produtos.dto.ProductDTO;
+import lucas.ifmg.produtos.entities.Category;
 import lucas.ifmg.produtos.entities.Product;
 import lucas.ifmg.produtos.repositories.ProductRepository;
 import lucas.ifmg.produtos.services.exceptions.ResourceNotFound;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -69,5 +71,9 @@ public class ProductService {
         product.setDescription(productDTO.getDescription());
         product.setPrice(productDTO.getPrice());
         product.setImageUrl(productDTO.getImageUrl());
-    }
+        product.setCategories(productDTO.getCategories()
+            .stream()
+            .map(categoryDTO -> new Category(categoryDTO.getId(), categoryDTO.getName()))
+            .collect(Collectors.toSet()));
+    }   
 }
