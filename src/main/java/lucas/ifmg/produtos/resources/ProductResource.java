@@ -1,5 +1,8 @@
 package lucas.ifmg.produtos.resources;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import lucas.ifmg.produtos.dto.ProductDTO;
 import lucas.ifmg.produtos.services.ProductService;
 
@@ -29,41 +31,51 @@ public class ProductResource {
     @Autowired
     private ProductService productService;
 
-    @GetMapping
+    @GetMapping(produces = "application/json")
     public ResponseEntity<Page<ProductDTO>> findAll(Pageable pageable) {
-        // Implement pagination and sorting logic
-        // Pageable pageable = PageRequest.of(page, size, Sort.Direction.valueOf(direction), orderBy);
-
         Page<ProductDTO> products = productService.findAll(pageable);
+        products.forEach(product -> this.addHateoasLinks(product));
         return ResponseEntity.ok().body(products);
     }
 
-    @GetMapping(value = "/{id}")
+    @GetMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<ProductDTO> findById(@PathVariable Long id) {
         ProductDTO product = productService.findById(id);
+        this.addHateoasLinks(product);
         return ResponseEntity.ok().body(product);
     }
     
-    @PostMapping
+    @PostMapping(consumes = "application/json", produces = "application/json")
     public ResponseEntity<ProductDTO> insert(@RequestBody ProductDTO productDTO) {
-        ProductDTO newProduct = productService.insert(productDTO);
+        ProductDTO product = productService.insert(productDTO);
         URI uri = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .path("/{id}")
-            .buildAndExpand(newProduct.getId())
+            .buildAndExpand(product.getId())
             .toUri();
-        return ResponseEntity.created(uri).body(newProduct);
+        this.addHateoasLinks(product);
+
+        return ResponseEntity.created(uri).body(product);
     }
 
-    @PutMapping(value = "/{id}")
+    @PutMapping(value = "/{id}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<ProductDTO> update(@PathVariable Long id, @RequestBody ProductDTO productDTO) {
-        ProductDTO updatedProduct = productService.update(id, productDTO);
-        return ResponseEntity.ok().body(updatedProduct);
+        ProductDTO product = productService.update(id, productDTO);
+        this.addHateoasLinks(product);
+        return ResponseEntity.ok().body(product);
     }
     
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping(value = "/{id}", produces = "application/json")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         productService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private void addHateoasLinks(ProductDTO product) {
+        product.add(linkTo(methodOn(ProductResource.class).findAll(Pageable.unpaged())).withRel("list"))
+            .add(linkTo(methodOn(ProductResource.class).findById(product.getId())).withSelfRel())
+            .add(linkTo(methodOn(ProductResource.class).insert(product)).withRel("insert"))
+            .add(linkTo(methodOn(ProductResource.class).update(product.getId(), product)).withRel("update"))
+            .add(linkTo(methodOn(ProductResource.class).delete(product.getId())).withRel("delete"));
     }
 }

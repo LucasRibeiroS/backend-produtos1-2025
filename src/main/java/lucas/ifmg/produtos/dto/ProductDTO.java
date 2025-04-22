@@ -6,7 +6,9 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ProductDTO {
+import org.springframework.hateoas.RepresentationModel;
+
+public class ProductDTO extends RepresentationModel<ProductDTO> {
     private Long id;
     private String name;
     private String description;
