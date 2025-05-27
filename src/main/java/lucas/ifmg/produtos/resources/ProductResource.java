@@ -1,5 +1,8 @@
 package lucas.ifmg.produtos.resources;
 
+import lucas.ifmg.produtos.dto.ProductDTO;
+import lucas.ifmg.produtos.services.ProductService;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
@@ -20,8 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lucas.ifmg.produtos.dto.ProductDTO;
-import lucas.ifmg.produtos.services.ProductService;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/products")
@@ -46,7 +48,7 @@ public class ProductResource {
     }
     
     @PostMapping(consumes = "application/json", produces = "application/json")
-    public ResponseEntity<ProductDTO> insert(@RequestBody ProductDTO productDTO) {
+    public ResponseEntity<ProductDTO> insert(@Valid @RequestBody ProductDTO productDTO) {
         ProductDTO product = productService.insert(productDTO);
         URI uri = ServletUriComponentsBuilder
             .fromCurrentRequest()
@@ -59,7 +61,7 @@ public class ProductResource {
     }
 
     @PutMapping(value = "/{id}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<ProductDTO> update(@PathVariable Long id, @RequestBody ProductDTO productDTO) {
+    public ResponseEntity<ProductDTO> update(@PathVariable Long id, @Valid @RequestBody ProductDTO productDTO) {
         ProductDTO product = productService.update(id, productDTO);
         this.addHateoasLinks(product);
         return ResponseEntity.ok().body(product);

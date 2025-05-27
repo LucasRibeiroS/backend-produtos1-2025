@@ -1,31 +1,48 @@
 package lucas.ifmg.produtos.dto;
 
 import lucas.ifmg.produtos.entities.Product;
+import lucas.ifmg.produtos.entities.Category;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import org.springframework.hateoas.RepresentationModel;
 
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
 public class ProductDTO extends RepresentationModel<ProductDTO> {
-    private Long id;
+    @Schema(description = "Database generated ID product")
+    private long id;
+
+    @Schema(description = "Product Name")
+    @Size(min = 3, max = 255, message = "Deve ter entre 3 e 255 caracteres.")
     private String name;
+
+    @Schema(description = "A detailed description of the product")
     private String description;
-    private Double price;
+
+    @Schema(description = "Product Price")
+    @Positive(message = "Preço deve ter um valor positivo.")
+    private double price;
+
+    @Schema(description = "A image url represents this product.")
     private String imageUrl;
+
+    @Schema(description = "Product categories (one or more)")
+    @NotEmpty(message = "Produto deve ter pelo menos uma categoria.")
     private Set<CategoryDTO> categories = new HashSet<>();
 
     public ProductDTO() {
-    }
 
-    public ProductDTO(Long id, String name, String description, Double price, String imageUrl, Set<CategoryDTO> categories) {
-        this.id = id;
+    }
+    public ProductDTO(String name, String description, double price, String imageUrl) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.imageUrl = imageUrl;
-        this.categories = categories;
     }
 
     public ProductDTO(Product entity) {
@@ -34,16 +51,20 @@ public class ProductDTO extends RepresentationModel<ProductDTO> {
         this.description = entity.getDescription();
         this.price = entity.getPrice();
         this.imageUrl = entity.getImageUrl();
-        this.categories = entity.getCategories().stream()
-                .map(CategoryDTO::new)
-                .collect(Collectors.toSet());
+
+        entity.getCategories().forEach(c -> this.categories.add(new CategoryDTO(c)));
     }
 
-    public Long getId() {
+    public ProductDTO(Product product, Set<Category> categories) {
+        this(product);
+        categories.forEach(c-> this.categories.add(new CategoryDTO(c)));
+    }
+
+    public long getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -63,11 +84,11 @@ public class ProductDTO extends RepresentationModel<ProductDTO> {
         this.description = description;
     }
 
-    public Double getPrice() {
+    public double getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
@@ -88,6 +109,17 @@ public class ProductDTO extends RepresentationModel<ProductDTO> {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ProductDTO product)) return false;
+        return id == product.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+
+    @Override
     public String toString() {
         return "ProductDTO{" +
                 "id=" + id +
@@ -97,11 +129,5 @@ public class ProductDTO extends RepresentationModel<ProductDTO> {
                 ", imageUrl='" + imageUrl + '\'' +
                 ", categories=" + categories +
                 '}';
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        // TODO Auto-generated method stub
-        return super.equals(obj);
     }
 }

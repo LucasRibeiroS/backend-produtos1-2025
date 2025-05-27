@@ -5,6 +5,7 @@ import lucas.ifmg.produtos.dto.UserDTO;
 import lucas.ifmg.produtos.dto.UserInsertDTO;
 import lucas.ifmg.produtos.entities.Role;
 import lucas.ifmg.produtos.entities.User;
+import lucas.ifmg.produtos.projections.UserDetailsProjection;
 import lucas.ifmg.produtos.repositories.RoleRepository;
 import lucas.ifmg.produtos.repositories.UserRepository;
 import lucas.ifmg.produtos.services.exceptions.DatabaseException;
@@ -15,14 +16,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository repository;
@@ -82,6 +87,23 @@ public class UserService {
         } catch (DataIntegrityViolationException e) {
             throw new DatabaseException("Integrity violation");
         }
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        List<UserDetailsProjection> result = repository.searchUserAndRoleByEmail(username);
+
+        if(result.isEmpty()) {
+            throw new UsernameNotFoundException("User not found with username " + username);
+        }
+
+        User user = new User();
+        user.setEmail(result.get(0).getUsername());
+        user.setPassword(result.get(0).getPassword());
+        for (UserDetailsProjection p : result) {
+            user.addRole( new Role(p.getRoleId(), p.getAuthority()));
+        }
+        return user;
     }
 
     private void copyDtoToEntity(UserDTO dto, User entity) {
