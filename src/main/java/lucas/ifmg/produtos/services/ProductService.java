@@ -1,11 +1,13 @@
 package lucas.ifmg.produtos.services;
 
 import lucas.ifmg.produtos.dto.ProductDTO;
+import lucas.ifmg.produtos.dto.ProductListDTO;
 import lucas.ifmg.produtos.entities.Category;
 import lucas.ifmg.produtos.entities.Product;
 import lucas.ifmg.produtos.repositories.ProductRepository;
 import lucas.ifmg.produtos.services.exceptions.ResourceNotFound;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -28,6 +30,17 @@ public class ProductService {
     public Page<ProductDTO> findAll(Pageable pageable) {
         Page<Product> page = productRepository.findAll(pageable);
         return page.map(ProductDTO::new);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductListDTO> findAllPaged(Pageable pageable, String categoryId, String name) {
+        Page<?> pageResult = productRepository.searchProducts(
+            categoryId.isBlank() ? null : List.of(Long.parseLong(categoryId)),
+            name,
+            pageable
+        );
+        Page<ProductListDTO> page = pageResult.map(product -> new ProductListDTO((Product) product));
+        return page;
     }
 
     @Transactional(readOnly = true)

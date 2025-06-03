@@ -61,6 +61,6 @@ INSERT INTO users (first_name, last_name, email, password) VALUES ('Maria', 'Gre
 INSERT INTO roles (authority) VALUES ('ROLE_ADMIN');
 INSERT INTO roles (authority) VALUES ('ROLE_OPERATOR');
 
-INSERT INTO users_to_roles (user_id, role_id) VALUES (1, 1);
+INSERT INTO users_to_roles (user_id, role_id) VALUES (1, 2);
 INSERT INTO users_to_roles (user_id, role_id) VALUES (2, 1);
 INSERT INTO users_to_roles (user_id, role_id) VALUES (2, 2);
