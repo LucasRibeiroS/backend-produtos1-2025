@@ -35,16 +35,22 @@ public class ProductService {
         return page.map(ProductDTO::new);
     }
 
-    @Transactional(readOnly = true)
-    public Page<ProductListDTO> findAllPaged(Pageable pageable, String categoryId, String name) {
-        List<Long> categoriesId=null;
-        if (!categoryId.equals("0")) {
-            categoriesId = Arrays.stream(categoryId.split(",")).map(id -> Long.parseLong(id)).toList();
+    public Page<ProductListDTO> findAllPaged(String name, String categoryId, Pageable pageable) {
+        List<Long> categoriesId = null;
+        if(!categoryId.equals("0")){
+                categoriesId = Arrays.stream(categoryId.split(","))
+                    .map(id -> Long.parseLong(id))
+                    .toList();
         }
 
-        Page<ProductProjection> page = productRepository.searchProducts(null, name, pageable);
+        Page<ProductProjection> page = categoriesId != null
+            ? productRepository.searchProductsWithCategories(categoriesId, name, pageable)
+            : productRepository.searchProductsWithoutCategories(name, pageable);
 
-        List<ProductListDTO> dtos = page.stream().map(p -> new ProductListDTO(p)).toList();
+        List<ProductListDTO> dtos = page
+                .stream().map(p -> new ProductListDTO(p))
+                .toList();
+
         return new PageImpl<>(dtos, pageable, page.getTotalElements());
     }
 

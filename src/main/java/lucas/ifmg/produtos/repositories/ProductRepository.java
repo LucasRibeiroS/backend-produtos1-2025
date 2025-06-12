@@ -11,28 +11,44 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-	@Query(nativeQuery = true,
+
+    @Query(nativeQuery = true,
         value = """
-            select * from
-            (
-                SELECT DISTINCT p.id, p.name, p.image_url, p.price
-                FROM products p
-                INNER JOIN categories_to_products cp ON cp.product_id = p.id
-                WHERE (:categoriesID IS NULL OR cp.category_id in :categoriesID) 
-                    and LOWER( p.name) like LOWER( CONCAT('%',:name,'%' ))
-            ) as tb_result
-            """,
+            select * from (
+                select distinct p.id , p.name , p.imageurl , p.price
+                from products p
+                inner Join categories_to_products cp on cp.product_id = p.id
+                where (cp.category_id  in :categoriesID) and lower(p.name) like lower(CONCAT ('%',:name,'%'))
+            ) as result
+        """,
         countQuery = """
-            select count(*) from
-            (
-                SELECT DISTINCT p.id, p.name, p.image_url, p.price
-                FROM products p
-                INNER JOIN categories_to_products cp ON cp.product_id = p.id
-                    WHERE (:categoriesID IS NULL OR cp.category_id in :categoriesID) 
-                        and LOWER( p.name) like LOWER( CONCAT('%',:name,'%' ))
-                    ) as tb_result
+            select count(*) from (
+                select distinct p.id , p.name , p.imageurl , p.price
+                from products p
+                inner Join categories_to_products cp on cp.product_id = p.id
+                where (cp.category_id  in :categoriesID) and lower(p.name) like lower (CONCAT ('%',:name,'%'))
+            ) as result
+        """
+    )
+    public Page<ProductProjection> searchProductsWithCategories(List<Long> categoriesID, String name, Pageable pageable);
+
+    @Query(nativeQuery = true,
+            value = """
+                select * from (
+                    select distinct p.id , p.name , p.imageurl , p.price
+                    from products p
+                    inner join categories_to_products cp on cp.product_id = p.id
+                    where lower(p.name) like lower(CONCAT ('%',:name,'%'))
+                ) as result
+            """,
+            countQuery = """
+                select count(*) from (
+                    select distinct p.id , p.name , p.imageurl , p.price
+                    from products p
+                    inner join categories_to_products cp on cp.product_id = p.id
+                    where lower(p.name) like lower(CONCAT ('%',:name,'%'))
+                ) as result
             """
     )
-    public Page<ProductProjection> searchProducts(List<Long> categoriesID, String name, Pageable pageable);
-    
+    Page<ProductProjection> searchProductsWithoutCategories(String name, Pageable pageable);
 }
