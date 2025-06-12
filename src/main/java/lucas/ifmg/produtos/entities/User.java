@@ -108,8 +108,7 @@ public class User implements UserDetails {
     }
 
     public boolean hasRole(String roleName) {
-        return
-                !roles.stream().filter(r -> r.getAuthority().equals(roleName)).toList().isEmpty();
+        return !roles.stream().filter(r -> r.getAuthority().equals(roleName)).toList().isEmpty();
     }
 
     @Override
