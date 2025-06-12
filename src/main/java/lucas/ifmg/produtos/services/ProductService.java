@@ -4,9 +4,11 @@ import lucas.ifmg.produtos.dto.ProductDTO;
 import lucas.ifmg.produtos.dto.ProductListDTO;
 import lucas.ifmg.produtos.entities.Category;
 import lucas.ifmg.produtos.entities.Product;
+import lucas.ifmg.produtos.projections.ProductProjection;
 import lucas.ifmg.produtos.repositories.ProductRepository;
 import lucas.ifmg.produtos.services.exceptions.ResourceNotFound;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,13 +37,15 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public Page<ProductListDTO> findAllPaged(Pageable pageable, String categoryId, String name) {
-        Page<?> pageResult = productRepository.searchProducts(
-            categoryId.isBlank() ? null : List.of(Long.parseLong(categoryId)),
-            name,
-            pageable
-        );
-        Page<ProductListDTO> page = pageResult.map(product -> new ProductListDTO((Product) product));
-        return page;
+        List<Long> categoriesId=null;
+        if (!categoryId.equals("0")) {
+            categoriesId = Arrays.stream(categoryId.split(",")).map(id -> Long.parseLong(id)).toList();
+        }
+
+        Page<ProductProjection> page = productRepository.searchProducts(null, name, pageable);
+
+        List<ProductListDTO> dtos = page.stream().map(p -> new ProductListDTO(p)).toList();
+        return new PageImpl<>(dtos, pageable, page.getTotalElements());
     }
 
     @Transactional(readOnly = true)

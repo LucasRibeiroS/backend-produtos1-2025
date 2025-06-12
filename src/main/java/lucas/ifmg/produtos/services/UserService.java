@@ -106,6 +106,10 @@ public class UserService implements UserDetailsService {
         return user;
     }
 
+    public UserDTO signup(UserInsertDTO dto) {
+        return dto;
+    }
+
     private void copyDtoToEntity(UserDTO dto, User entity) {
         entity.setFirstName(dto.getFirstName());
         entity.setLastName(dto.getLastName());
@@ -117,5 +121,4 @@ public class UserService implements UserDetailsService {
             entity.getRoles().add(r);
         }
     }
-
 }

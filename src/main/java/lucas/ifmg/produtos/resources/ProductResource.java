@@ -39,13 +39,6 @@ public class ProductResource {
     private ProductService productService;
 
     @GetMapping(produces = "application/json")
-    public ResponseEntity<Page<ProductDTO>> findAll(Pageable pageable) {
-        Page<ProductDTO> products = productService.findAll(pageable);
-        products.forEach(product -> this.addHateoasLinks(product));
-        return ResponseEntity.ok().body(products);
-    }
-
-    @GetMapping(produces = "application/json")
     @Operation(
         description = "Get all products",
         summary = "List all registered products",
@@ -53,12 +46,25 @@ public class ProductResource {
             @ApiResponse(description = "ok", responseCode = "200"),
         }
     )
-    
-    public ResponseEntity<Page<ProductListDTO>> findAllPaged(
+    public ResponseEntity<Page<ProductDTO>> findAll(Pageable pageable) {
+        Page<ProductDTO> products = productService.findAll(pageable);
+        products.forEach(product -> this.addHateoasLinks(product));
+        return ResponseEntity.ok().body(products);
+    }
+
+    @GetMapping(value = "/paged", produces = "application/json")
+    @Operation(
+        description = "Get all products paged",
+        summary = "List all registered products paged",
+        responses = {
+            @ApiResponse(description = "ok", responseCode = "200"),
+        }
+    )
+    public ResponseEntity<Page<ProductListDTO>> findAllPaged (
         Pageable pageable,
         @RequestParam(value = "categoryId", defaultValue = "0") String categoryId,
-        @RequestParam(value = "name", defaultValue = "") String name)
-    {
+        @RequestParam(value="name", defaultValue = "") String name
+    ) {
         Page<ProductListDTO> products = productService.findAllPaged(pageable, categoryId, name);
         return ResponseEntity.ok().body(products);
     }

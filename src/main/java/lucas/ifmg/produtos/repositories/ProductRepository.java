@@ -13,12 +13,12 @@ import org.springframework.data.jpa.repository.Query;
 public interface ProductRepository extends JpaRepository<Product, Long> {
 	@Query(nativeQuery = true,
         value = """
-            select (*) from
+            select * from
             (
                 SELECT DISTINCT p.id, p.name, p.image_url, p.price
-                FROM tb_product p
-                INNER JOIN tb_product_category pc ON pc.product_id = p.id
-                Where (:categoriesID IS NULL || pc.category_id in :categoriesID) 
+                FROM products p
+                INNER JOIN categories_to_products cp ON cp.product_id = p.id
+                WHERE (:categoriesID IS NULL OR cp.category_id in :categoriesID) 
                     and LOWER( p.name) like LOWER( CONCAT('%',:name,'%' ))
             ) as tb_result
             """,
@@ -26,9 +26,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             select count(*) from
             (
                 SELECT DISTINCT p.id, p.name, p.image_url, p.price
-                FROM tb_product p
-                INNER JOIN tb_product_category pc ON pc.product_id = p.id
-                    Where (:categoriesID IS NULL || pc.category_id in :categoriesID) 
+                FROM products p
+                INNER JOIN categories_to_products cp ON cp.product_id = p.id
+                    WHERE (:categoriesID IS NULL OR cp.category_id in :categoriesID) 
                         and LOWER( p.name) like LOWER( CONCAT('%',:name,'%' ))
                     ) as tb_result
             """
