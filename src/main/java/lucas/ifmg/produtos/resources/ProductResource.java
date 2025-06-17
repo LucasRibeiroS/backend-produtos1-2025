@@ -65,7 +65,7 @@ public class ProductResource {
         @RequestParam(value = "categoryId", defaultValue = "0") String categoryId,
         @RequestParam(value="name", defaultValue = "") String name
     ) {
-        Page<ProductListDTO> products = productService.findAllPaged(pageable, categoryId, name);
+        Page<ProductListDTO> products = productService.findAllPaged(name, categoryId, pageable);
         return ResponseEntity.ok().body(products);
     }
 

@@ -1,10 +1,9 @@
 package lucas.ifmg.produtos.dto;
 
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
-public class EmailDto {
+public class EmailDTO {
 
     @NotBlank
     @Email
@@ -13,10 +12,13 @@ public class EmailDto {
     @NotBlank
     private String body;
 
-    public EmailDto() {
+    public EmailDTO() {
     }
 
-    public EmailDto(String to, String subject, String body) {
+    public EmailDTO(String token, String email, String subject, String body) {
+    }
+
+    public EmailDTO(String to, String subject, String body) {
         this.to = to;
         this.subject = subject;
         this.body = body;

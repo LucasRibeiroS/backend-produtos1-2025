@@ -1,6 +1,6 @@
 package lucas.ifmg.produtos.services;
 
-import lucas.ifmg.produtos.dto.EmailDto;
+import lucas.ifmg.produtos.dto.EmailDTO;
 import lucas.ifmg.produtos.services.exceptions.EmailException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ public class EmailService {
     @Autowired
     private JavaMailSender mailSender;
 
-    public void sendMail(EmailDto emailDTO) {
+    public void sendMail(EmailDTO emailDTO) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(EmailService);

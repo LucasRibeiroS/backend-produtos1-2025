@@ -1,6 +1,6 @@
 package lucas.ifmg.produtos.resources;
 
-import lucas.ifmg.produtos.dto.EmailDto;
+import lucas.ifmg.produtos.dto.EmailDTO;
 import lucas.ifmg.produtos.services.EmailService;
 
 import jakarta.validation.Valid;
@@ -20,7 +20,7 @@ public class EmailResource {
     private EmailService emailService;
 
     @PostMapping
-    public ResponseEntity<Void> sendEmail(@Valid @RequestBody EmailDto dto){
+    public ResponseEntity<Void> sendEmail(@Valid @RequestBody EmailDTO dto){
         emailService.sendMail(dto);
         return ResponseEntity.noContent().build();
     }
