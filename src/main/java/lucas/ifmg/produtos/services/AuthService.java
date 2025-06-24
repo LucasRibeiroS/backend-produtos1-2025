@@ -81,5 +81,6 @@ public class AuthService {
 
         User user = userRepository.findByEmail(list.getFirst().getEmail());
         user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
     }
 }

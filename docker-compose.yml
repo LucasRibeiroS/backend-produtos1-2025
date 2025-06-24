@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: productsDb
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    networks:
+      - productsNW
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: products
+
+  api-products:
+    build:
+      context: ./
+    container_name: products-api
+    ports:
+      - "8080:8080"
+    environment:
+      - CORS_ORIGINS=http://localhost:3000,http://localhost
+    depends_on:
+      - db
+    networks:
+      - productsNW
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
+    restart: always
+
+networks:
+  productsNW:
+    driver: bridge
+
+volumes:
+  dbdata:
